@@ -1,0 +1,112 @@
+@model IEnumerable<Temp_pro.Models.TEMPERATURE>
+
+@{
+    ViewBag.Title = "Index";    
+
+    var message = "";
+    var a = "";
+    var i = 1;
+}
+
+
+<h2>Index</h2>
+<form action="@Url.Action("Index")" method="post" enctype="multipart/form-data">
+    <label for="file">Filename:</label>
+    <input type="file" name="file" id="file" />
+    <button id="test">ABC</button>
+</form>
+
+
+<table class="table">
+    <thead class="thead-dark">
+        <tr>
+            <th>ID</th>
+            <th>
+                @Html.DisplayNameFor(model => model.EMPLOYEE_ID)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.BODY_TEMP)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DATE_TIME)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.COMMENT)
+            </th>
+        </tr>
+    </thead>
+    
+    <tbody>
+        @if (@ViewBag.Message != "nodata")
+        {
+            foreach (var item in Model.Select((value, index) => new { value, index }))
+            { 
+                if (string.IsNullOrEmpty(item.value.EMPLOYEE_ID) || (item.value.BODY_TEMP == 0) || (item.value.DATE_TIME == Convert.ToDateTime("0001/1/1 上午 12:00:00")))
+                {
+                    a = "test";
+                }
+                else
+                {
+                    a = "test2";
+                }
+                <tr class="@a">
+                    @{ 
+                        var index = @Html.DisplayFor(modelItem => item.index).ToString();
+                        var untindex = Convert.ToInt32(index);
+                        untindex++;
+                    }
+                    <td>@untindex</td>  
+
+
+                    @if (!string.IsNullOrEmpty(item.value.EMPLOYEE_ID))
+                    {
+                        <td>
+                            @Html.DisplayFor(modelItem => item.value.EMPLOYEE_ID)
+                        </td>
+                    }
+                    else
+                    {
+                        message += "No EMPLOYEE_ID data! ";
+                        <td></td>
+                    }
+
+                    @if (!(item.value.BODY_TEMP == 0))
+                    {
+                        <td>
+                            @Html.DisplayFor(modelItem => item.value.BODY_TEMP)
+                        </td>
+                    }
+                    else
+                    {
+                        message += "No BODY_TEMP data! ";
+                        <td></td>
+                    }
+
+
+                    @if (!(item.value.DATE_TIME == Convert.ToDateTime("0001/1/1 上午 12:00:00")) && (item.value.DATE_TIME.Date == Convert.ToDateTime(DateTime.Now.Date)))
+                    {
+                        <td>
+                            @Html.DisplayFor(modelItem => item.value.DATE_TIME)
+                        </td>
+                    }
+                    else if((item.value.DATE_TIME == Convert.ToDateTime("0001/1/1 上午 12:00:00")))
+                    {
+                        message += "No DATE_TIME data! ";
+                        <td></td>
+                    }
+                    else
+                    {
+                        message += "Not Today! ";
+                        <td>
+                            @Html.DisplayFor(modelItem => item.value.DATE_TIME)
+                        </td>
+                    }
+
+                    <td>@message</td>
+                </tr>
+
+                message = "";
+            }
+        }
+    </tbody>
+</table>
