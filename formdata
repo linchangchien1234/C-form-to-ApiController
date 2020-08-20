@@ -1,0 +1,45 @@
+$("#bnUpload").click(function () {
+    var dir = $("#cbDirNames").val();
+    var f1 = $("#tbFileName1").val();
+    var f2 = $("#tbFileName2").val();
+
+    if ((f1 == null || f1 == "") && (f2 == null || f2 == "")) {
+        alert("至少要上傳一個檔案。");
+        return;
+    }
+
+    var formData = new FormData();
+    formData.append("DirName", dir);
+
+    if (f1 != null && f1 != "") {
+        var files = $("#tbFileName1").get(0).files;
+        if (files.length > 0) {
+            formData.append("File1", files[0]);  // Add the uploaded image content to the form data collection
+        }
+    }
+
+    if (f2 != null && f2 != "") {
+        var files = $("#tbFileName2").get(0).files;
+        if (files.length > 0) {
+            formData.append("File2", files[0]);  // Add the uploaded image content to the form data collection
+        }
+    }
+
+    $.ajax({
+        type: "post",
+        //url: '@Url.Action("Upload", "Api/FilesApi")',
+        url:"Api/FilesApi",
+        async: false,
+        data: formData,
+        contentType: false,
+        processData: false,
+        success: function (data, status) {
+            alert(data);
+        },
+        error: function (xhr, status, err) {
+            alert("ajax呼叫異常: " + status + "," + err);
+        }
+    }).then(function (data) {
+        console.log(data);
+    });
+});
