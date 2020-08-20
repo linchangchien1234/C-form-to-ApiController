@@ -1,0 +1,106 @@
+ [HttpPost]
+        public ActionResult Index(HttpPostedFileBase file)
+        {
+
+            var temp_object = new List<TEMPERATURE>();
+            var temp_object_database = new List<TEMPERATURE>();
+            var filenameck = new ByteData();
+            var filenamecklist = new List<ByteData>();
+            var abv = filenamecklist.Count;
+            //temp_object.();
+            //temp_object_database.RemoveAll();
+
+            if (file != null)
+            {
+                if (file.ContentLength > 0)
+                {
+
+                    //////////抓取檔案名稱+副檔名
+                    //////////var fileName = Path.GetFileName(file.FileName);
+                    //////// var fileName = DateTime.Now.ToString("yyyyMMddHHmmss") + Path.GetExtension(file.FileName);
+                    //////////var fileName = "2020-08-19T171010" + Path.GetExtension(file.FileName);
+                    //////////檔案存至之位置~/FileUploads
+                    ////////var path = Path.Combine(Server.MapPath("~/FileUploads"), fileName);
+
+                    //////////將選取檔案储存一份至指定path
+                    ////////file.SaveAs(path);
+
+                    //////////將excel檔案的內容使用mapper做資料比對
+
+                    ////////var mapper = new Mapper(path);
+                    ////////var rows = mapper.Take<TEMPERATURE>(0).ToList();
+                    ////////mapper = null;
+
+                    Mapper mapper = new Mapper();
+
+                    var fileName = Path.GetFileName(file.FileName);
+                    using (Stream fileStream = file.InputStream)
+                    {
+                        //將excel檔案的內容使用mapper做資料比對
+                        mapper = new Mapper(fileStream);
+                    }
+                    var rows = mapper.Take<TEMPERATURE>(0).ToList();
+                    mapper = null;
+
+
+                    //應該有更好的方法
+                    //---------------------------------------------------------
+                    //將mapper的值轉為TEMPERATURE物件使用
+
+                    foreach (var row in rows)
+                    {
+                        var temp = new TEMPERATURE
+                        {
+                            EMPLOYEE_ID = row.Value.EMPLOYEE_ID,
+                            BODY_TEMP = row.Value.BODY_TEMP,
+                            DATE_TIME = row.Value.DATE_TIME
+
+                        };
+                        temp_object.Add(temp);
+                    }
+                    //---------------------------------------------------------------
+
+
+
+                    //將預設日期轉為DateTime
+                    DateTime aa = new DateTime(2020, 1, 1);
+                    foreach (var row in temp_object)
+                    {
+                        //檢查使用者輸入的工號、溫度、日期是否為空值
+                        //預設工號為""、溫度為0、日期為"0001/1/1 上午 12:00:00"
+                        //檢查日期是否為使用系統當天日期******(不比對當日時間)*************
+                        if (!string.IsNullOrEmpty(row.EMPLOYEE_ID) && !(row.BODY_TEMP == 0) && !(row.DATE_TIME == aa) &&
+                            (row.DATE_TIME.Date == DateTime.Now.Date))
+                        {
+                            //database
+                            var temp1 = new TEMPERATURE
+                            {
+                                EMPLOYEE_ID = row.EMPLOYEE_ID,
+                                BODY_TEMP = row.BODY_TEMP,
+                                DATE_TIME = row.DATE_TIME
+                            };
+                            temp_object_database.Add(temp1);
+                        }
+
+                    }
+
+
+                    var a = temp_object_database;
+                    ViewBag.Message = "";
+
+
+                    return View(temp_object);
+
+                }
+
+                return View();
+            }
+            else
+            {
+                ViewBag.Message = "nodata";
+
+                return View();
+            }
+
+
+        }
