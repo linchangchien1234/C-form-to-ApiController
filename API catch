@@ -1,0 +1,29 @@
+[HttpPost]
+        public string Upload()
+        {
+            try
+            {
+                var httpRequest = HttpContext.Current.Request;
+                var dirName = httpRequest.Form["DirName"];  // 獲取 FormData的鍵值
+
+
+                System.Text.StringBuilder ss = new System.Text.StringBuilder();
+                ss.Append("成功上傳檔案" + Environment.NewLine);
+
+
+                foreach (string key in httpRequest.Files)  // 檔案鍵
+                {
+                    var postedFile = httpRequest.Files[key];    // 獲取檔案鍵對應的檔案物件
+                    var file = dirName + postedFile.FileName;
+                    postedFile.SaveAs(file);
+                    ss.Append(file + Environment.NewLine);
+                }
+
+
+                return ss.ToString() + "OK!";
+            }
+            catch (Exception err)
+            {
+                return err.Message;
+            }
+        }  
